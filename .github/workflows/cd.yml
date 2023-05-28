@@ -183,10 +183,8 @@ jobs:
       - name: Upload Python wheels
         uses: actions/upload-artifact@v3
         with:
-          working-directory: pypi
           name: wheels
-          path: dist
-
+          path: pypi/dist
 
   publish-pypi:
     name: Publish PyPI package
