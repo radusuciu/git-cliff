@@ -119,7 +119,7 @@ jobs:
         with:
           working-directory: ../pypi
           target: ${{ matrix.build.TARGET }}
-          args: --release --manifest-path ../git-cliff/Cargo.toml --sdist --out dist
+          args: --release --manifest-path git-cliff/Cargo.toml --sdist --out dist
           sccache: 'true'
           manylinux: auto
       - name: Build Python wheels (macos & windows)
@@ -130,7 +130,7 @@ jobs:
         with:
           working-directory: ../pypi
           target: ${{ matrix.build.TARGET }}
-          args: --release --sdist --manifest-path ../git-cliff/Cargo.toml --out dist
+          args: --release --sdist --manifest-path git-cliff/Cargo.toml --out dist
           sccache: 'true'
       - name: Build Python wheels (musl)
         if: matrix.build.PYPI_PUBLISH == true && endsWith(matrix.build.OS, 'musl')
