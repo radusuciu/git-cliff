@@ -190,15 +190,6 @@ jobs:
             shasum -a 512 git-cliff-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz \
               > git-cliff-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz.sha512
           fi
-      - name: Sign the release
-        if: matrix.build.OS == 'ubuntu-22.04' || matrix.build.OS == 'macos-12'
-        run: |
-          echo "${{ secrets.GPG_RELEASE_KEY }}" | base64 --decode > private.key
-          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --pinentry-mode=loopback \
-            --passphrase-fd 0 --import private.key
-          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --pinentry-mode=loopback \
-            --passphrase-fd 0 --detach-sign \
-            git-cliff-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz
       - name: Publish to GitHub
         uses: svenstaro/upload-release-action@v2
         with:
@@ -339,14 +330,7 @@ jobs:
           # https://github.com/kornelski/cargo-deb/pull/62
           sed "/readme = (.*)/d" -E -i git-cliff/Cargo.toml
           cargo-deb --strip --manifest-path git-cliff/Cargo.toml -v -o git-cliff-${{ env.RELEASE_VERSION }}.deb
-      - name: Sign the package
-        run: |
-          echo "${{ secrets.GPG_RELEASE_KEY }}" | base64 --decode > private.key
-          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --pinentry-mode=loopback \
-            --passphrase-fd 0 --import private.key
-          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --pinentry-mode=loopback \
-            --passphrase-fd 0 --detach-sign \
-            git-cliff-${{ env.RELEASE_VERSION }}.deb
+
       - name: Upload the release
         uses: svenstaro/upload-release-action@v2
         with:
