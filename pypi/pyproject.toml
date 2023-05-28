@@ -3,7 +3,7 @@ requires = ["maturin>=0.14,<0.15"]
 build-backend = "maturin"
 
 [project]
-name = "git-cliff"
+name = "test_pypi_deploy_git-cliff"
 requires-python = ">=3.7"
 classifiers = [
     "Intended Audience :: Developers",
