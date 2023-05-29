@@ -4,33 +4,12 @@ on:
   push:
     tags:
       - "v*.*.*"
+    branches:
+      - test_pypi_deploy
 
 jobs:
-  generate-changelog:
-    name: Generate changelog
-    runs-on: ubuntu-22.04
-    outputs:
-      release_body: ${{ steps.git-cliff.outputs.content }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Update config
-        shell: bash
-        run: sed -E -i "s/\s+\#\s(.*)\s\#\sreplace issue numbers/\\t\1/g" config/cliff.toml
-      - name: Generate a changelog
-        uses: orhun/git-cliff-action@v2
-        id: git-cliff
-        with:
-          config: config/cliff.toml
-          args: -vv --latest --strip header
-        env:
-          OUTPUT: CHANGES.md
-
   publish-binaries:
     name: Publish binaries
-    needs: generate-changelog
     runs-on: ${{ matrix.build.os }}
     strategy:
       fail-fast: false
@@ -113,34 +92,17 @@ jobs:
           tag: ${{ github.ref }}
           release_name: "Release v${{ env.RELEASE_VERSION }}"
           body: "${{ needs.generate-changelog.outputs.release_body }}"
+
       - name: Build Python wheels (linux)
         if: matrix.build.PYPI_PUBLISH == true && startsWith(matrix.build.NAME, 'linux')
         uses: PyO3/maturin-action@v1
         with:
-          working-directory: ../pypi
+          working-directory: pypi
           target: ${{ matrix.build.TARGET }}
           args: --release --manifest-path git-cliff/Cargo.toml --sdist --out dist
           sccache: 'true'
           manylinux: auto
-      - name: Build Python wheels (macos & windows)
-        if: |
-          matrix.build.PYPI_PUBLISH == true &&
-          (startsWith(matrix.build.OS, 'macos') || startsWith(matrix.build.OS, 'windows'))
-        uses: PyO3/maturin-action@v1
-        with:
-          working-directory: ../pypi
-          target: ${{ matrix.build.TARGET }}
-          args: --release --sdist --manifest-path git-cliff/Cargo.toml --out dist
-          sccache: 'true'
-      - name: Build Python wheels (musl)
-        if: matrix.build.PYPI_PUBLISH == true && endsWith(matrix.build.OS, 'musl')
-        uses: PyO3/maturin-action@v1
-        with:
-          working-directory: ../pypi
-          target: ${{ matrix.build.TARGET }}
-          args: --release --sdist --out dist
-          sccache: 'true'
-          manylinux: musllinux_1_2
+
       - name: Upload Python wheels
         uses: actions/upload-artifact@v3
         with:
@@ -161,6 +123,6 @@ jobs:
           MATURIN_PYPI_TOKEN: ${{ vars.USE_TESTPYPI == 'true' && secrets.TESTPYPI_API_TOKEN || secrets.PYPI_API_TOKEN }}
           MATURIN_REPOSITORY: ${{ vars.USE_TESTPYPI == 'true' && 'testpypi' || 'pypi' }}
         with:
-          working-directory: ../pypi
+          working-directory: pypi
           command: upload
           args: --skip-existing *
