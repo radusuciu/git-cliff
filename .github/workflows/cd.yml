@@ -99,7 +99,7 @@ jobs:
         with:
           working-directory: pypi
           target: ${{ matrix.build.TARGET }}
-          args: --release --manifest-path --out wheels
+          args: --release --sdist --out wheels
           sccache: 'true'
           manylinux: auto
 
