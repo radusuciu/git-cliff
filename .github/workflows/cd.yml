@@ -105,6 +105,7 @@ jobs:
     needs: publish-binaries
     steps:
       - uses: actions/download-artifact@v3
+        path: pypi/wheels
         with:
           name: wheels
       - name: Publish to PyPI
