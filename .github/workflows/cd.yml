@@ -99,7 +99,7 @@ jobs:
         with:
           working-directory: pypi
           target: ${{ matrix.build.TARGET }}
-          args: --release --manifest-path git-cliff/Cargo.toml --sdist --out dist
+          args: --release --manifest-path ../git-cliff/Cargo.toml --sdist --out dist
           sccache: 'true'
           manylinux: auto
 
