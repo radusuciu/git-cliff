@@ -47,7 +47,7 @@ jobs:
         if: matrix.build.OS != 'windows-2022'
         uses: actions-rs/cargo@v1
         with:
-          use-cross: true
+          use-cross: false
           command: build
           args: --release --locked --target ${{ matrix.build.TARGET }}
       - name: Build (windows)
@@ -82,16 +82,6 @@ jobs:
             shasum -a 512 git-cliff-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz \
               > git-cliff-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz.sha512
           fi
-      - name: Publish to GitHub
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: git-cliff-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}*
-          file_glob: true
-          overwrite: true
-          tag: ${{ github.ref }}
-          release_name: "Release v${{ env.RELEASE_VERSION }}"
-          body: "${{ needs.generate-changelog.outputs.release_body }}"
 
       - name: Build Python wheels (linux)
         if: matrix.build.PYPI_PUBLISH == true && startsWith(matrix.build.NAME, 'linux')
@@ -123,6 +113,6 @@ jobs:
           MATURIN_PYPI_TOKEN: ${{ vars.USE_TESTPYPI == 'true' && secrets.TESTPYPI_API_TOKEN || secrets.PYPI_API_TOKEN }}
           MATURIN_REPOSITORY: ${{ vars.USE_TESTPYPI == 'true' && 'testpypi' || 'pypi' }}
         with:
-          working-directory: pypi
+          working-directory: pypi/wheels
           command: upload
           args: --skip-existing *
