@@ -99,7 +99,7 @@ jobs:
         with:
           working-directory: pypi
           target: ${{ matrix.build.TARGET }}
-          args: --release --manifest-path ../git-cliff/Cargo.toml --sdist --out dist
+          args: --release --manifest-path --out wheels
           sccache: 'true'
           manylinux: auto
 
@@ -107,7 +107,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: pypi/dist
+          path: pypi/wheels
 
   publish-pypi:
     name: Publish PyPI package
