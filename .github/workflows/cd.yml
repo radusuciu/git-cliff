@@ -113,6 +113,5 @@ jobs:
           MATURIN_PYPI_TOKEN: ${{ vars.USE_TESTPYPI == 'true' && secrets.TESTPYPI_API_TOKEN || secrets.PYPI_API_TOKEN }}
           MATURIN_REPOSITORY: ${{ vars.USE_TESTPYPI == 'true' && 'testpypi' || 'pypi' }}
         with:
-          working-directory: pypi/wheels
           command: upload
-          args: --skip-existing *
+          args: --skip-existing pypi/wheels/*

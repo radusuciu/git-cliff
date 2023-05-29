@@ -1,1 +1,1 @@
--P ubuntu-22.04=catthehacker/ubuntu:full-latest -s .secrets
+-P ubuntu-22.04=catthehacker/ubuntu:full-latest --secret-file .secrets
