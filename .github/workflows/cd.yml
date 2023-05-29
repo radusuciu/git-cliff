@@ -105,8 +105,8 @@ jobs:
     needs: publish-binaries
     steps:
       - uses: actions/download-artifact@v3
-        path: pypi/wheels
         with:
+          path: pypi/wheels
           name: wheels
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
