@@ -461,7 +461,7 @@ dependencies = [
 
 [[package]]
 name = "git-cliff"
-version = "1.3.2"
+version = "1.3.14"
 dependencies = [
  "clap",
  "clap_complete",
@@ -478,7 +478,7 @@ dependencies = [
 
 [[package]]
 name = "git-cliff-core"
-version = "1.3.2"
+version = "1.3.14"
 dependencies = [
  "config",
  "git-conventional",
