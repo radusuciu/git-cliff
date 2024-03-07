@@ -34,54 +34,6 @@ jobs:
       matrix:
         build:
           - {
-              NAME: linux-x64-glibc,
-              OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
-              TARGET: x86_64-unknown-linux-gnu,
-              NPM_PUBLISH: true,
-              PYPI_PUBLISH: true,
-            }
-          - {
-              NAME: linux-x64-musl,
-              OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
-              TARGET: x86_64-unknown-linux-musl,
-              NPM_PUBLISH: false,
-              PYPI_PUBLISH: true,
-            }
-          - {
-              NAME: linux-x86-glibc,
-              OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
-              TARGET: i686-unknown-linux-gnu,
-              NPM_PUBLISH: false,
-              PYPI_PUBLISH: false,
-            }
-          - {
-              NAME: linux-x86-musl,
-              OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
-              TARGET: i686-unknown-linux-musl,
-              NPM_PUBLISH: false,
-              PYPI_PUBLISH: true,
-            }
-          - {
-              NAME: linux-arm64-glibc,
-              OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
-              TARGET: aarch64-unknown-linux-gnu,
-              NPM_PUBLISH: true,
-              PYPI_PUBLISH: true,
-            }
-          - {
-              NAME: linux-arm64-musl,
-              OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
-              TARGET: aarch64-unknown-linux-musl,
-              NPM_PUBLISH: false,
-              PYPI_PUBLISH: true,
-            }
-          - {
               NAME: win32-x64-mingw,
               OS: windows-2022,
               TOOLCHAIN: stable,
@@ -94,7 +46,7 @@ jobs:
               OS: windows-2022,
               TOOLCHAIN: stable,
               TARGET: x86_64-pc-windows-msvc,
-              NPM_PUBLISH: true,
+              NPM_PUBLISH: false,
               PYPI_PUBLISH: true,
             }
           - {
@@ -110,24 +62,8 @@ jobs:
               OS: windows-2022,
               TOOLCHAIN: stable,
               TARGET: aarch64-pc-windows-msvc,
-              NPM_PUBLISH: true,
+              NPM_PUBLISH: false,
               PYPI_PUBLISH: false,
-            }
-          - {
-              NAME: darwin-x64,
-              OS: macos-12,
-              TOOLCHAIN: stable,
-              TARGET: x86_64-apple-darwin,
-              NPM_PUBLISH: true,
-              PYPI_PUBLISH: true,
-            }
-          - {
-              NAME: darwin-arm64,
-              OS: macos-12,
-              TOOLCHAIN: stable,
-              TARGET: aarch64-apple-darwin,
-              NPM_PUBLISH: true,
-              PYPI_PUBLISH: true,
             }
     steps:
       - name: Checkout
