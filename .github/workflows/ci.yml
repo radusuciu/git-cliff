@@ -274,5 +274,5 @@ jobs:
           manylinux: musllinux_1_2
       - name: Test wheel installation
         run: |
-          pip install --no-index --find-links=pypi/wheels git-cliff
+          pip install --no-index --find-links=pypi/wheels --debug --verbose git-cliff
           git-cliff --version
