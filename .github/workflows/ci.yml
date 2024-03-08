@@ -251,7 +251,7 @@ jobs:
         with:
           working-directory: pypi
           target: ${{ matrix.build.TARGET }}
-          args: --release --sdist --out wheels
+          args: --release --out wheels
           sccache: "true"
           # https://github.com/PyO3/maturin-action/issues/245
           manylinux: ${{ matrix.build.TARGET == 'aarch64-unknown-linux-gnu' && '2_28' || 'auto' }}
@@ -261,7 +261,7 @@ jobs:
         with:
           working-directory: pypi
           target: ${{ matrix.build.TARGET }}
-          args: --release --sdist --out wheels
+          args: --release --out wheels
           sccache: "true"
       - name: Build Python wheels (musl)
         if: endsWith(matrix.build.OS, 'musl')
@@ -269,11 +269,10 @@ jobs:
         with:
           working-directory: pypi
           target: ${{ matrix.build.TARGET }}
-          args: --release --sdist --out wheels
+          args: --release --out wheels
           sccache: "true"
           manylinux: musllinux_1_2
       - name: Test wheel installation
-        shell: bash
         run: |
-          pip install --no-index --debug --verbose ./pypi/wheels/git-cliff*.whl
+          pip install --no-index --find-links=pypi/wheels --debug --verbose git-cliff
           git-cliff --version
