@@ -273,6 +273,7 @@ jobs:
           sccache: "true"
           manylinux: musllinux_1_2
       - name: Test wheel installation
+        shell: bash
         run: |
           pip install --no-index --debug --verbose ./pypi/wheels/git-cliff*.whl
           git-cliff --version
