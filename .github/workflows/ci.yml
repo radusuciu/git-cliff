@@ -273,6 +273,8 @@ jobs:
           sccache: "true"
           manylinux: musllinux_1_2
       - name: Test wheel installation
+        shell: bash
         run: |
+          ls -lah pypi/wheels
           pip install --no-index --find-links=pypi/wheels --debug --verbose git-cliff
           git-cliff --version
