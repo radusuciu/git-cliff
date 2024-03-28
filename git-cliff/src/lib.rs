@@ -347,6 +347,8 @@ pub fn run(mut args: Opt) -> Result<()> {
 		config
 	} else if path.exists() {
 		Config::parse(&path)?
+	} else if let Some(contents) = Config::read_from_manifest()? {
+		Config::parse_from_str(&contents)?
 	} else {
 		if !args.context {
 			warn!(
@@ -384,7 +386,7 @@ pub fn run(mut args: Opt) -> Result<()> {
 		}
 	}
 	if args.body.is_some() {
-		config.changelog.body = args.body.clone();
+		config.changelog.body.clone_from(&args.body);
 	}
 	if args.sort == Sort::Oldest {
 		if let Some(ref sort_commits) = config.git.sort_commits {
@@ -398,7 +400,7 @@ pub fn run(mut args: Opt) -> Result<()> {
 		}
 	}
 	if args.github_token.is_some() {
-		config.remote.github.token = args.github_token.clone();
+		config.remote.github.token.clone_from(&args.github_token);
 	}
 	if let Some(ref remote) = args.github_repo {
 		config.remote.github.owner = remote.0.owner.to_string();
@@ -418,7 +420,7 @@ pub fn run(mut args: Opt) -> Result<()> {
 	}
 	config.git.skip_tags = config.git.skip_tags.filter(|r| !r.as_str().is_empty());
 	if args.tag_pattern.is_some() {
-		config.git.tag_pattern = args.tag_pattern.clone();
+		config.git.tag_pattern.clone_from(&args.tag_pattern);
 	}
 
 	// Process the repositories.
@@ -464,16 +466,24 @@ pub fn run(mut args: Opt) -> Result<()> {
 
 	// Print the result.
 	if args.bump || args.bumped_version {
-		if let Some(next_version) = changelog.bump_version()? {
-			if args.bumped_version {
-				if let Some(path) = args.output {
-					let mut output = File::create(path)?;
-					output.write_all(next_version.as_bytes())?;
-				} else {
-					println!("{next_version}");
-				}
-				return Ok(());
+		let next_version = if let Some(next_version) = changelog.bump_version()? {
+			next_version
+		} else if let Some(last_version) =
+			changelog.releases.first().cloned().and_then(|v| v.version)
+		{
+			warn!("There is nothing to bump.");
+			last_version
+		} else {
+			return Ok(());
+		};
+		if args.bumped_version {
+			if let Some(path) = args.output {
+				let mut output = File::create(path)?;
+				output.write_all(next_version.as_bytes())?;
+			} else {
+				println!("{next_version}");
 			}
+			return Ok(());
 		}
 	}
 	if args.context {

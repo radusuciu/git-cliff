@@ -1,5 +1,8 @@
 use crate::commit::Commit;
-use crate::config::Config;
+use crate::config::{
+	Config,
+	GitConfig,
+};
 use crate::error::Result;
 #[cfg(feature = "github")]
 use crate::github::{
@@ -24,7 +27,8 @@ use std::time::{
 /// Changelog generator.
 #[derive(Debug)]
 pub struct Changelog<'a> {
-	releases:        Vec<Release<'a>>,
+	/// Releases that the changelog will contain.
+	pub releases:    Vec<Release<'a>>,
 	body_template:   Template,
 	footer_template: Option<Template>,
 	config:          &'a Config,
@@ -56,6 +60,25 @@ impl<'a> Changelog<'a> {
 		Ok(changelog)
 	}
 
+	/// Processes a single commit and returns/logs the result.
+	fn process_commit(
+		commit: Commit<'a>,
+		git_config: &GitConfig,
+	) -> Option<Commit<'a>> {
+		match commit.process(git_config) {
+			Ok(commit) => Some(commit),
+			Err(e) => {
+				trace!(
+					"{} - {} ({})",
+					commit.id[..7].to_string(),
+					e,
+					commit.message.lines().next().unwrap_or_default().trim()
+				);
+				None
+			}
+		}
+	}
+
 	/// Processes the commits and omits the ones that doesn't match the
 	/// criteria set by configuration file.
 	fn process_commits(&mut self) {
@@ -65,31 +88,20 @@ impl<'a> Changelog<'a> {
 				.commits
 				.iter()
 				.cloned()
+				.filter_map(|commit| Self::process_commit(commit, &self.config.git))
 				.flat_map(|commit| {
 					if self.config.git.split_commits.unwrap_or(false) {
 						commit
 							.message
 							.lines()
-							.map(|line| {
+							.flat_map(|line| {
 								let mut c = commit.clone();
 								c.message = line.to_string();
-								c
+								Self::process_commit(c, &self.config.git)
 							})
 							.collect()
 					} else {
 						vec![commit]
-					}
-				})
-				.filter_map(|commit| match commit.process(&self.config.git) {
-					Ok(commit) => Some(commit),
-					Err(e) => {
-						trace!(
-							"{} - {} ({})",
-							commit.id[..7].to_string(),
-							e,
-							commit.message.lines().next().unwrap_or_default().trim()
-						);
-						None
 					}
 				})
 				.collect::<Vec<Commit>>();
@@ -199,7 +211,8 @@ impl<'a> Changelog<'a> {
 	pub fn bump_version(&mut self) -> Result<Option<String>> {
 		if let Some(ref mut last_release) = self.releases.iter_mut().next() {
 			if last_release.version.is_none() {
-				let next_version = last_release.calculate_next_version()?;
+				let next_version = last_release
+					.calculate_next_version_with_config(&self.config.bump)?;
 				debug!("Bumping the version to {next_version}");
 				last_release.version = Some(next_version.to_string());
 				last_release.timestamp = SystemTime::now()
@@ -306,9 +319,9 @@ impl<'a> Changelog<'a> {
 mod test {
 	use super::*;
 	use crate::config::{
+		Bump,
 		ChangelogConfig,
 		CommitParser,
-		GitConfig,
 		Remote,
 		RemoteConfig,
 		TextProcessor,
@@ -484,6 +497,7 @@ mod test {
 					token: None,
 				},
 			},
+			bump:      Bump::default(),
 		};
 		let test_release = Release {
 			version: Some(String::from("v1.0.0")),
