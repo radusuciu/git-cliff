@@ -1,6 +1,6 @@
 [![animation](https://raw.githubusercontent.com/orhun/git-cliff/main/website/static/img/git-cliff-anim.gif)](https://git-cliff.org)
 
-## [2.2.2](https://github.com/radusuciu/git-cliff/compare/v2.1.2..v2.2.2) - 2024-03-28
+## [2.2.3](https://github.com/radusuciu/git-cliff/compare/v2.1.2..v2.2.3) - 2024-03-28
 
 ### ⛰️  Features
 
